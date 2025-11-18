@@ -1,0 +1,48 @@
+version: '1.0'
+
+services:
+  # --- MySQL Master Configuration ---
+  mysql-master:
+    image: mysql:8.0
+    container_name: mysql-master
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: sync_test
+      MYSQL_ROOT_PASSWORD: 1234
+    command:
+      --server-id=1
+      --log-bin=mysql-bin
+      --binlog-do-db=sync_test
+    volumes:
+      - master-data:/var/lib/mysql
+    networks:
+      - mysql-net
+
+  # --- MySQL Replica Configuration ---
+  mysql-replica:
+    image: mysql:8.0
+    container_name: mysql-replica
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_DATABASE: sync_test
+      MYSQL_ROOT_PASSWORD: 1234
+    command:
+      --server-id=2
+      --log-bin=mysql-bin
+      --binlog-do-db=sync_test
+    volumes:
+      - replica-data:/var/lib/mysql
+    depends_on: # as this is configured as the read replica which follows master
+      - mysql-master
+    networks:
+      - mysql-net
+
+volumes:
+  master-data:
+  replica-data:
+
+networks:
+  mysql-net:
+    driver: bridge
