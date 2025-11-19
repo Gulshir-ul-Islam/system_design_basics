@@ -39,6 +39,26 @@ services:
     networks:
       - mysql-net
 
+  api-service:
+    # Build the image from the Dockerfile in the current directory
+    build: ./api-service 
+    container_name: api-service
+    image: my-api-service
+    ports:
+      - "8000:3000" # Host port 8000 maps to container port 3000
+    environment:
+      MASTER_HOST: mysql-master
+      REPLICA_HOST: mysql-replica
+      DB_USER: root
+      DB_PASSWORD: 1234 # Should match your MySQL root password
+      DB_DATABASE: sync_test
+    depends_on:
+      # Ensure databases start before the API tries to connect
+      - mysql-master
+      - mysql-replica
+    networks:
+      - mysql-net
+
 volumes:
   master-data:
   replica-data:
