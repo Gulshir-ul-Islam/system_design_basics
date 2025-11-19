@@ -8,7 +8,7 @@ const DB_DATABASE = process.env.DB_DATABASE || 'sync_test';
 
 //create master connection pool for writes
 console.log(`creating master pool to: ${MASTER_HOST}`);
-export const masterPool = mysql.createPool({
+exports.masterPool = mysql.createPool({
     host: MASTER_HOST,
     user: DB_USER,
     password: DB_PASSWORD,
@@ -22,7 +22,7 @@ export const masterPool = mysql.createPool({
  * internal container-to-container traffic uses the exposed internal port i.e., 3306 for replica also.
  */
 console.log(`creating replica pool to: ${REPLICA_HOST}`);
-export const replicaPool = mysql.createPool({
+exports.replicaPool = mysql.createPool({
     host: REPLICA_HOST,
     user: DB_USER,
     password: DB_PASSWORD,

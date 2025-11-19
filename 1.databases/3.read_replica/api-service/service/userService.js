@@ -1,4 +1,4 @@
-const { masterPool, replicaPool } = require("../db")
+const { masterPool, replicaPool } = require("../db/client")
 
 /**
  * Note: It is on the application to query the right mysql server.
@@ -8,7 +8,7 @@ const { masterPool, replicaPool } = require("../db")
  * With this read replica, the master is to do "writes"
  */
 
-export const getAllUsers = async (_req, res) => {
+exports.getAllUsers = async (_req, res) => {
     try {
         const [users] = await replicaPool.execute("SELECT id, name from users");
         return res.status(200).json({
@@ -25,7 +25,7 @@ export const getAllUsers = async (_req, res) => {
     
 }
 
-export const addUser = async (req, res) => {
+exports.addUser = async (req, res) => {
     try{
         const username = req.body.name;
         const [user] = await masterPool.execute("INSERT INTO users(name) VALUES(?)", [username])
@@ -39,11 +39,17 @@ export const addUser = async (req, res) => {
     }
 }
 
-export const updateUser = async (req, res) => {
+exports.updateUser = async (req, res) => {
     try{
         const username = req.body.name;
         const userId = req.params.userId;
-        const [user] = await masterPool.execute("UPDATE users SET name=? WHERE id=?", [username, userId])
+        if (!username) {
+            return res.status(400).json({ message: "New name is required for update." });
+        }
+        const [result] = await masterPool.execute("UPDATE users SET name = ? WHERE id = ?", [username, userId]);
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: `User with ID ${userId} not found.` });
+        }
         return res.status(200).json({
             message: `updated user with id:${user.id} successfully`
         })
@@ -54,12 +60,17 @@ export const updateUser = async (req, res) => {
     }
 }
 
-export const deleteUser = async (req, res) => {
+exports.deleteUser = async (req, res) => {
     try{
         const userId = req.params.userId;
-        await masterPool.execute("DELETE FROM users WHERE id=?", [userId])
+        const [result] = await masterPool.execute("DELETE FROM users WHERE id = ?", [userId]);
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: `User with ID ${userId} not found.` });
+        }
+
         return res.status(200).json({
-            message: `created user with id:${user.id} successfully`
+            message: `deleted user with id:${user.id} successfully`
         })
     }
     catch(error) {
