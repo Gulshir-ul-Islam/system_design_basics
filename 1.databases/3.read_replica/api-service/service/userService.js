@@ -14,7 +14,7 @@ exports.getAllUsers = async (_req, res) => {
         return res.status(200).json({
             data: {
                 users: users,
-                count: users.count
+                count: users.length
             } 
         });
     }
@@ -28,9 +28,9 @@ exports.getAllUsers = async (_req, res) => {
 exports.addUser = async (req, res) => {
     try{
         const username = req.body.name;
-        const [user] = await masterPool.execute("INSERT INTO users(name) VALUES(?)", [username])
+        const [result] = await masterPool.execute("INSERT INTO users(name) VALUES(?)", [username])
         return res.status(200).json({
-            message: `created user with id:${user.id} successfully`
+            message: `created user with id:${result.insertId} successfully`
         })
     }
     catch(error) {
@@ -70,7 +70,7 @@ exports.deleteUser = async (req, res) => {
         }
 
         return res.status(200).json({
-            message: `deleted user with id:${user.id} successfully`
+            message: `deleted user with id:${userId} successfully`
         })
     }
     catch(error) {
