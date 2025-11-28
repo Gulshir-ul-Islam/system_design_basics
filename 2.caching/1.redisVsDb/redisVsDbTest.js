@@ -59,7 +59,7 @@ const main = async() => {
         // Establish redis connection
         await connectRedis();
 
-        // DB SELECT MEASUREMENT
+        // DB SELECT measurement
         console.log(`Fetching all ${DATA_SIZE} rows from DB`);
         let startTime = process.hrtime.bigint();
         const [rows] = await dbConnection.execute('SELECT * FROM products');
@@ -73,6 +73,7 @@ const main = async() => {
         const serializedData = JSON.stringify(productsData);
         await client.set(CACHE_KEY, serializedData);
 
+        // Cache GET measurement
         console.log(`Retrieving cached data`);
         startTime = process.hrtime.bigint();
         const cachedDataRaw = await client.get(CACHE_KEY);

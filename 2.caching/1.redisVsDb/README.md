@@ -38,13 +38,17 @@ docker exec -it mysql mysql -u root -p1234 -e "CREATE DATABASE IF NOT EXISTS tes
 
 Navigate to your project directory and install the required Node.js libraries.
 
+```bash
 npm install
+```
 
 ### Step 4: Run the Benchmark
 
 The main script handles all logic: database creation, table setup, data insertion, and time measurement.
 
+```bash
 node redisVsDbTest.js
+```
 
 ## Expected Output (Example)
 
