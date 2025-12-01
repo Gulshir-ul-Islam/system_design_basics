@@ -1,0 +1,16 @@
+{
+  "name": "message_broker_basics",
+  "version": "1.0.0",
+  "description": "Message Broker Basics",
+  "main": "index.js",
+  "scripts": {
+    "start": "node main.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Gulshir ul Islam",
+  "license": "ISC",
+  "dependencies": {
+    "amqplib": "^0.10.9",
+    "express": "^5.2.0"
+  }
+}

@@ -1,0 +1,34 @@
+const express = require("express");
+const { initRabbitMQ, sendMsg } = require("./producer");
+
+const app = new express();
+const PORT = 3000;
+
+app.use(express.json());
+
+app.post("/messages", async (req, res) => {
+    return await sendMsg(req, res);
+});
+
+/**
+ * Main function to start the server: 
+ * 1. Initialize RabbitMQ connection.
+ * 2. Start listening for HTTP requests.
+ */
+const startServer = async() => {
+    try {
+        // Initialize RabbitMQ (must succeed before starting the API)
+        await initRabbitMQ();
+        
+        // Start the Express API server
+        app.listen(PORT, () => {
+            console.log(`API Server started at http://localhost:${PORT}`);
+        });
+    } catch (e) {
+        console.error("Server failed to start due to RabbitMQ connection error. Exiting.");
+        // Exit the process if the core messaging dependency (RabbitMQ) is unavailable
+        process.exit(1); 
+    }
+}
+
+startServer();
