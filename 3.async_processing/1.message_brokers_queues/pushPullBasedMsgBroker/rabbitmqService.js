@@ -51,14 +51,35 @@ const sendMsg = async (req, res) => {
         } else {
             console.log(`Failed to send a message`);
         }
-        res.status(201).json("success");
+        res.status(202).json("success");
     } catch (error) {
         console.log(`Error in Producer: ${error}`);
         res.status(500).json("Internal server error. Please try after some time.")
     }
 }
 
+const getMsg = async () => {
+    // channel.get performs a synchronous pull operation.
+    // { noAck: true } tells RabbitMQ to immediately remove the message upon delivery,
+    // which is suitable for a simple HTTP polling endpoint.
+    const msg = await channel.get(QUEUE_NAME, { noAck: true });
+    if (msg) {
+        try {
+            const content = JSON.parse(msg.content.toString());
+            console.log(`Pulled and auto-acknowledged message: ${content.data.substring(0, 30)}...`);
+            return content;
+        } catch (e) {
+            console.error("Error parsing message content:", e);
+            return null;
+        }
+    } else {
+        console.log(`Queue '${QUEUE_NAME}' is empty (GET request).`);
+        return null;
+    }
+}
+
 module.exports = {
     initRabbitMQ,
-    sendMsg
+    sendMsg,
+    getMsg
 }

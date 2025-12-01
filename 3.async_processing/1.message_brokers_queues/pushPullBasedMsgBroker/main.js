@@ -1,5 +1,5 @@
 const express = require("express");
-const { initRabbitMQ, sendMsg } = require("./producer");
+const { initRabbitMQ, sendMsg, getMsg } = require("./rabbitmqService");
 
 const app = new express();
 const PORT = 3000;
@@ -9,6 +9,16 @@ app.use(express.json());
 app.post("/messages", async (req, res) => {
     return await sendMsg(req, res);
 });
+
+app.get("/messages", async (req, res) => {
+    const message = await getMsg();
+    if(!message) {
+        return res.status(204).send();
+    }
+    return res.status(200).json({
+        message
+    })
+})
 
 /**
  * Main function to start the server: 
