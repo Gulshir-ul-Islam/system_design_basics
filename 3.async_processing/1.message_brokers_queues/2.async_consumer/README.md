@@ -22,7 +22,10 @@ To see the end-to-end asynchronous flow:
 npm i
 node consumer.js
 ```
-# Output: Waiting for messages in task_queue. To exit, press CTRL+C
+
+```text
+Output: Waiting for messages in task_queue. To exit, press CTRL+C
+```
 
 ### 2. Monitor and Produce
 
