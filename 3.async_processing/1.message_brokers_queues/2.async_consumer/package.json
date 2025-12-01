@@ -1,0 +1,14 @@
+{
+  "name": "async_consumer",
+  "version": "1.0.0",
+  "description": "Asynchronous Consumer that continuously monitors/listens the queue",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Gulshir ul Islam",
+  "license": "ISC",
+  "dependencies": {
+    "amqplib": "^0.10.9"
+  }
+}
