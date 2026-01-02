@@ -12,11 +12,28 @@ A Circuit Breaker acts as a proxy that sits between services and monitors for fa
 | **🔴 OPEN** | **Block Traffic** | If failures cross a threshold, the "circuit trips." All requests fail **instantly**. |
 | **🟡 HALF-OPEN**| **Test Traffic** | After a "sleep window," a few trial requests are allowed through to see if the service recovered. |
 
+## Comparison: System Stability
 
-### Why use this?
-1.  **Fail Fast:** Instead of making a user wait 30 seconds for a timeout, return an error in milliseconds.
-2.  **Resource Preservation:** Prevents your server from hanging on to open sockets for requests doomed to fail.
-3.  **Self-Healing:** Gives the struggling downstream service "space" to recover without being hammered.
+### Without a Circuit Breaker (The Cascading Failure)
+When Service B hangs or becomes slow, the following happens to Service A:
+1. **Open Connections:** Every incoming request to Service A starts a new connection to Service B.
+2. **Resource Exhaustion:** Service A's memory and worker threads are held hostage by Service B's slow response.
+3. **Queue Saturation:** The request queue fills up, and Service A can no longer accept *any* new traffic—even for features that don't depend on Service B.
+4. **Crash:** Eventually, Service A crashes due to memory limits or timeout accumulation. One single failing dependency has brought down the entire system.
+
+### With a Circuit Breaker (The Fail-Fast Approach)
+1. **Detection:** After 3 failed attempts, the circuit "trips" to **OPEN**.
+2. **Immediate Rejection:** Subsequent requests to Service A are rejected instantly. 
+3. **Resource Preservation:** Service A does not open any new sockets to the failing Service B, keeping its memory and threads free to serve other healthy features.
+
+
+## Note on Fallback Responses
+
+When the circuit is **OPEN**, Service A doesn't necessarily have to return a "Hard Error." It can return a **Fallback Response**. This is highly dependent on your application requirements:
+
+* **E-commerce:** If the Recommendation service is down, the fallback could be a static list of "Best Sellers."
+* **Social Media:** If the Like-Count service is down, the fallback could be to simply hide the like count or show "0" rather than failing the whole post-load.
+* **General:** Returning stale data from a cache is a common fallback strategy to keep the UI functional.
 
 
 ## Experiments Conducted
