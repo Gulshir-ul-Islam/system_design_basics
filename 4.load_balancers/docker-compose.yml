@@ -1,0 +1,24 @@
+version: '3.8'
+services:
+  server1:
+    build: .
+    environment:
+      - SERVER_ID=1
+      - PORT=3000
+    command: node server.js
+
+  server2:
+    build: .
+    environment:
+      - SERVER_ID=2
+      - PORT=3000
+    command: node server.js
+
+  loadbalancer:
+    build: .
+    ports:
+      - "8080:80"
+    command: node lb.js
+    depends_on:
+      - server1
+      - server2
