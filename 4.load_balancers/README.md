@@ -28,15 +28,13 @@ To prevent sending traffic to a crashed server, the LB performs **Active Health 
 **Lesson:** Proved that the Round Robin algorithm effectively shares the load.
 
 ### Experiment 2: Failover & Recovery: 
-Even if one of the servers crash, it will not take down the whole syste. Load Balancer will forward requests to other healthy servers therefore ensuring **Availability**.
+Even if one of the servers crash, it will not take down the whole system. Load Balancer will forward requests to other healthy servers therefore ensuring **Availability**.
 
 **Action:** Ran `docker stop` on one server and monitored the traffic.
 
 **Result:** After the 5-second health check interval, the Load Balancer identified the failure and routed 100% of the traffic to the remaining healthy server.
 
 **Lesson:** Demonstrated how Load Balancers provide **Redundancy** and **High Availability**.
-
----
 
 ## Execution Guide
 
@@ -45,7 +43,7 @@ Even if one of the servers crash, it will not take down the whole syste. Load Ba
    docker compose up -d --build
    ```
 
-2. **Test the Load Balancer:** Run this loop in your Ubuntu terminal to observe the distribution:
+2. **Test the Load Balancer:** Run this loop in the bash terminal to observe the distribution:
     ```bash
     for i in {1..6}; do curl http://localhost:8080/user/$i; echo ""; done
     ```
