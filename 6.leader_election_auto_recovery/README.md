@@ -58,3 +58,20 @@ Once the TTL expires in Redis, the key is deleted. In the next check cycle, one 
 - **Mutual Exclusion:** No two nodes ever increment the counter at the same time.
 
 - **Stateful Continuity:** Using a shared database allows the new leader to pick up work exactly where the old one stopped.
+
+## Architectural Notes
+
+### 1. The Algorithm: How Workers Choose a Leader
+In our implementation, we use a **Static Priority "Race" Algorithm** (also known as a simple Distributed Lock).
+* **The Mechanism:** Instead of workers voting (like in Raft or Paxos), they compete for a shared resource in Redis.
+* **The "First-to-Finish" Rule:** Because Redis is single-threaded, it processes requests one by one. The first worker whose `SET NX` request reaches Redis wins. Redis acts as the **Arbiter**, ensuring that even if two requests arrive at nearly the same microsecond, only one is granted the "Leader" status.
+* **Selection Bias:** In this specific model, the "fastest" node (lowest network latency to Redis) or the one whose timer hits zero first after a TTL expiry will always become the new leader.
+
+### 2. A Generic Framework for Auto-Recovery
+This is not just for counters; it is a universal pattern for high availability (HA):
+* **Database Failover:** Used to promote a Read-Replica to a Primary DB if the master node crashes.
+* **Scheduled Jobs (Cron):** Ensures that a "Send Newsletter" job only runs once, even if you have 10 instances of the worker service running.
+* **API Gateways:** Appointing a leader to manage dynamic routing tables or SSL certificate renewals.
+* **Distributed File Systems:** Choosing a "Name Node" to track where files are stored across hundreds of disks.
+
+**Core Principle:** Whenever a task **must not be duplicated** but **must always be running**, use Leader Election.
