@@ -1,0 +1,7 @@
+services:
+  redis:
+    image: redis:alpine
+  worker:
+    build: .
+    deploy:
+      replicas: 3
