@@ -1,0 +1,26 @@
+services:
+  chat-server:
+    build:
+      context: .
+      dockerfile: ./server/Dockerfile
+    ports:
+      - "3000:3000"
+    networks:
+      - chat-net
+
+  chat-worker:
+    build:
+      context: .
+      dockerfile: ./client/Dockerfile
+    deploy:
+      replicas: 3
+    depends_on:
+      - chat-server
+    environment:
+      - SERVER_URL=http://chat-server:3000
+    networks:
+      - chat-net
+
+networks:
+  chat-net:
+    driver: bridge
